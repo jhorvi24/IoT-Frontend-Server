@@ -6,30 +6,36 @@
 
 {%block content%}
 
-<div class="current-values">
-    <div class="container mt4">
-        <div class="row">
-           <!-- Left column--> 
-            <div class="col-md-6">
-    
-                <div class="value-box">
-                    <h3>Temperatura Actual</h3>
-                    <div id="currentTemp" class="current-temp">-- °C</div>
-                </div>    
-    
-            </div>          
-    
-            <!--right column-->
-    
-            <div class="col-md-6">
-    
-                <div class="value-box">
-                    <h3>Humedad Actual</h3>
-                    <div id="currentHum" class="current-hum">-- %</div>
-                </div>    
-            </div>    
+<div class="container mt-4">
+    <h2 class="text-center mb-4">IoT Monitoring Dashboard</h2>
+    <div class="row">
+        <!-- Temperature Card -->
+        <div class="col-md-6">
+            <div class="value-box">
+                <div class="status-indicator"></div>
+                <h3><i class="fas fa-temperature-high icon text-danger"></i>Temperatura Actual</h3>
+                <div id="currentTemp" class="current-temp">
+                    --°C
+                    <i class="fas fa-thermometer-half"></i>
+                </div>                
+               
+            </div>
         </div>
-    </div>        
+
+        <!-- Humidity Card -->
+        <div class="col-md-6">
+            <div class="value-box">
+                <div class="status-indicator"></div>
+                <h3><i class="fas fa-tint icon text-primary"></i>Humedad Actual</h3>
+                <div id="currentHum" class="current-hum">
+                    --%
+                    <i class="fas fa-tint"></i>
+                </div>
+                
+                
+            </div>
+        </div>
+    </div>
 </div>
 
 
