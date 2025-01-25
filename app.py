@@ -29,7 +29,7 @@ def save_to_csv(temperature, humidity):
 
 @app.route('/')
 def index():
-    return render_template('index1.html')
+    return render_template('index.html')
 
 @app.route('/data', methods=['POST'])
 def data_received():

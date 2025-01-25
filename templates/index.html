@@ -1,151 +1,164 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Sensor DHT11 Data</title>
-    <script src="https://code.highcharts.com/highcharts.js"></script>
-    <script src="https://code.highcharts.com/modules/exporting.js"></script>
-    <script src="https://code.highcharts.com/modules/export-data.js"></script>
-    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
-    <style>
-        .chart-container {
-            width: 80%;
-            margin: 20px auto;
-            height: 400px;
-        }
-    </style>
-</head>
-<body>
+{% extends "base.html" %}
 
-    <div class="current-values">
-        <div class="value-box">
-            <h3>Temperatura Actual</h3>
-            <div id="currentTemp" class="current-temp">-- °C</div>
+{% block title %}
+    IoT Server
+{% endblock %}
+
+{%block content%}
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">IoT Monitoring Dashboard</h2>
+    <div class="row">
+        <!-- Temperature Card -->
+        <div class="col-md-6">
+            <div class="value-box">
+                <div class="status-indicator"></div>
+                <h3><i class="fas fa-temperature-high icon text-danger"></i>Temperatura Actual</h3>
+                <div id="currentTemp" class="current-temp">
+                    --°C
+                    <i class="fas fa-thermometer-half"></i>
+                </div>                
+               
+            </div>
         </div>
-        <div class="value-box">
-            <h3>Humedad Actual</h3>
-            <div id="currentHum" class="current-hum">-- %</div>
+
+        <!-- Humidity Card -->
+        <div class="col-md-6">
+            <div class="value-box">
+                <div class="status-indicator"></div>
+                <h3><i class="fas fa-tint icon text-primary"></i>Humedad Actual</h3>
+                <div id="currentHum" class="current-hum">
+                    --%
+                    <i class="fas fa-tint"></i>
+                </div>
+                
+                
+            </div>
         </div>
     </div>
+</div>
 
 
-    <div class="chart-container">
-        <div id="tempChart"></div>
-    </div>
-    <div class="chart-container">
-        <div id="humChart"></div>
-    </div>
 
-    <script>
-        // Configuración común para ambas gráficas
-        const commonOptions = {
-            chart: {
-                type: 'spline',
-                animation: Highcharts.svg,
-                marginRight: 10,
-                height: 400
-            },
-            time: {
-                useUTC: false
-            },
-            plotOptions: {
-                spline: {
-                    marker: {
-                        enabled: true
-                    }
+
+<div class="chart-container">
+    <div id="tempChart"></div>
+</div>
+<div class="chart-container">
+    <div id="humChart"></div>
+</div>
+
+<script>
+    // Configuración común para ambas gráficas
+    const commonOptions = {
+        chart: {
+            type: 'spline',
+            animation: Highcharts.svg,
+            marginRight: 10,
+            height: 400
+        },
+        time: {
+            useUTC: false
+        },
+        plotOptions: {
+            spline: {
+                marker: {
+                    enabled: true
                 }
-            },
-            xAxis: {
-                type: 'datetime',
-                tickPixelInterval: 150
-            },
-            credits: {
-                enabled: false
             }
-        };
-
-        // Inicializar gráfica de temperatura
-        const tempChart = Highcharts.chart('tempChart', Highcharts.merge(commonOptions, {
-            title: {
-                text: 'Temperatura'
-            },
-            yAxis: {
-                title: {
-                    text: 'Temperatura (°C)'
-                }
-            },
-            series: [{
-                name: 'Temperatura',
-                color: '#FF3333',
-                data: []
-            }]
-        }));
-
-        // Inicializar gráfica de humedad
-        const humChart = Highcharts.chart('humChart', Highcharts.merge(commonOptions, {
-            title: {
-                text: 'Humedad'
-            },
-            yAxis: {
-                title: {
-                    text: 'Humedad (%)'
-                }
-            },
-            series: [{
-                name: 'Humedad',
-                color: '#3333FF',
-                data: []
-            }]
-        }));
-
-        function updateCharts() {
-            fetch('https://5000-jhorvi24-iotfrontendser-uotxw5lei3y.ws-us117.gitpod.io/temperature')
-                .then(response => response.json())
-                .then(data => {
-                    // Procesar los datos
-                    const processedData = data.map(item => {
-                        const timestamp = new Date(item.time).getTime();
-                        return {
-                            timestamp: timestamp,
-                            temperature: item.temperature,
-                            humidity: item.humidity
-                        };
-                    }).filter(item => 
-                        item.temperature !== null && 
-                        item.humidity !== null && 
-                        !isNaN(item.temperature) && 
-                        !isNaN(item.humidity)
-                    );
-
-                    console.log(data)
-
-
-                    // Update current values
-                    if (processedData.length > 0) {
-                        const lastReading = processedData[processedData.length - 1];
-                        document.getElementById('currentTemp').textContent = 
-                            `${lastReading.temperature.toFixed(1)} °C`;
-                        document.getElementById('currentHum').textContent = 
-                            `${lastReading.humidity.toFixed(1)} %`;
-                    }
-
-                    // Preparar datos para las gráficas
-                    const tempData = processedData.map(item => [item.timestamp, item.temperature]);
-                    const humData = processedData.map(item => [item.timestamp, item.humidity]);
-
-                    // Actualizar las series
-                    tempChart.series[0].setData(tempData, true);
-                    humChart.series[0].setData(humData, true);
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                });
+        },
+        xAxis: {
+            type: 'datetime',
+            tickPixelInterval: 150
+        },
+        credits: {
+            enabled: false
         }
+    };
 
-        // Actualizar las gráficas cada 5 segundos
-        setInterval(updateCharts, 5000);
-        
-        // Actualización inicial
-        updateCharts();
-    </script>
-</body>
-</html>
+    // Inicializar gráfica de temperatura
+    const tempChart = Highcharts.chart('tempChart', Highcharts.merge(commonOptions, {
+        title: {
+            text: 'Temperatura'
+        },
+        yAxis: {
+            title: {
+                text: 'Temperatura (°C)'
+            }
+        },
+        series: [{
+            name: 'Temperatura',
+            color: '#FF3333',
+            data: []
+        }]
+    }));
+
+    // Inicializar gráfica de humedad
+    const humChart = Highcharts.chart('humChart', Highcharts.merge(commonOptions, {
+        title: {
+            text: 'Humedad'
+        },
+        yAxis: {
+            title: {
+                text: 'Humedad (%)'
+            }
+        },
+        series: [{
+            name: 'Humedad',
+            color: '#3333FF',
+            data: []
+        }]
+    }));
+    
+    function updateCharts() {
+        fetch('https://5000-jhorvi24-iotfrontendser-i3csggrq0e2.ws-us117.gitpod.io/temperature')
+            .then(response => response.json())
+            .then(data => {
+                // Procesar los datos
+                const processedData = data.map(item => {
+                    const timestamp = new Date(item.time).getTime();
+                    return {
+                        timestamp: timestamp,
+                        temperature: item.temperature,
+                        humidity: item.humidity
+                    };
+                }).filter(item => 
+                    item.temperature !== null && 
+                    item.humidity !== null && 
+                    !isNaN(item.temperature) && 
+                    !isNaN(item.humidity)
+                );
+
+                console.log(data)
+
+
+                // Update current values
+                if (processedData.length > 0) {
+                    const lastReading = processedData[processedData.length - 1];
+                    document.getElementById('currentTemp').textContent = 
+                        `${lastReading.temperature.toFixed(1)} °C`;
+                    document.getElementById('currentHum').textContent = 
+                        `${lastReading.humidity.toFixed(1)} %`;
+                }
+
+                // Preparar datos para las gráficas
+                const tempData = processedData.map(item => [item.timestamp, item.temperature]);
+                const humData = processedData.map(item => [item.timestamp, item.humidity]);
+
+                // Actualizar las series
+                tempChart.series[0].setData(tempData, true);
+                humChart.series[0].setData(humData, true);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+    }
+
+    // Actualizar las gráficas cada 5 segundos
+    setInterval(updateCharts, 5000);
+    
+    // Actualización inicial
+    updateCharts();
+</script>
+
+{% endblock %}
